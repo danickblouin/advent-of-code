@@ -1,6 +1,6 @@
-# Advent of Code 2022
+# Advent of Code
 
-My solutions to the Advent of Code 2022.
+My solutions to the Advent of Code.
 Slowly relearning Python functionalities.
 Most of the solutions are not really optimized, just participating for fun.
 
