@@ -2,83 +2,44 @@ lines = [line.rstrip() for line in open('input.txt').readlines()]
 
 lines = [list(line) for line in lines]
 
+guards = "^>v<"
 
-def get_guard_pos():
+
+def get_pos(lines):
     for row in range(len(lines)):
-        for col in range(len(lines)):
-            if lines[row][col] == '^':
-                return [row, col], 'up'
-            elif lines[row][col] == 'v':
-                return [row, col], 'down'
-            elif lines[row][col] == '>':
-                return [row, col], 'right'
-            elif lines[row][col] == '<':
-                return [row, col], 'left'
+        for col in range(len(lines[row])):
+            if lines[row][col] in guards:
+                return [row, col]
 
 
-def check_obstacle(guard_pos):
-    row, col = guard_pos[0][0], guard_pos[0][1]
-    if guard_pos[1] == 'up' and (row + 1 < len(lines)) and lines[row - 1][col] == '#':
-        return True
-    if guard_pos[1] == 'down' and (row + 1 < len(lines)) and lines[row + 1][col] == '#':
-        return True
-    if guard_pos[1] == 'right' and (col + 1 < len(lines)) and lines[row][col + 1] == '#':
-        return True
-    if guard_pos[1] == 'left' and (col + 1 < len(lines)) and lines[row][col - 1] == '#':
-        return True
+dirs = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 
 
-def check_out(guard_pos):
-    row, col = guard_pos[0][0], guard_pos[0][1]
-    if row == 0 or row == len(lines) - 1 or col == 0 or col == len(lines) - 1:
-        return True
+def get_dir(row, col):
+    guard = lines[row][col]
+    return dirs[guards.index(guard)]
 
 
-total = 0
+l_pos = []
 
 while True:
-    pos = get_guard_pos()
-    row, col = pos[0][0], pos[0][1]
-    if pos[1] == 'up':
-        lines[row - 1][col] = '^'
-        lines[row][col] = 'X'
-        total += 1
-    elif pos[1] == 'down':
-        lines[row + 1][col] = 'v'
-        lines[row][col] = 'X'
-        total += 1
-    elif pos[1] == 'right':
-        lines[row][col + 1] = '>'
-        lines[row][col] = 'X'
-        total += 1
-    elif pos[1] == 'left':
-        lines[row][col - 1] = '<'
-        lines[row][col] = 'X'
-        total += 1
-
-    pos = get_guard_pos()
-    row, col = pos[0][0], pos[0][1]
-    if check_obstacle(pos):
-        if pos[1] == 'up':
-            lines[row][col] = '>'
-        elif pos[1] == 'down':
-            lines[row][col] = '<'
-        elif pos[1] == 'right':
-            lines[row][col] = 'v'
-        elif pos[1] == 'left':
-            lines[row][col] = '^'
-
-    pos = get_guard_pos()
-
-    if row == 0 or row == len(lines) - 1 or col == 0 or col == len(lines) - 1:
+    pos = get_pos(lines)
+    row, col = pos[0], pos[1]
+    if row in [0, len(lines) - 1] or col in [0, len(lines[row]) - 1]:
         break
+    direction = get_dir(row, col)
+    d_row, d_col = direction[0], direction[1]
+    if lines[row + d_row][col + d_col] == "#":
+        if guards.index(lines[row][col]) + 1 == len(guards):
+            lines[row][col] = guards[0]
+        else:
+            lines[row][col] = guards[guards.index(lines[row][col]) + 1]
+        continue
+    else:
+        lines[row + d_row][col + d_col] = lines[row][col]
 
+    lines[row][col] = "X"
+    if [row, col] not in l_pos:
+        l_pos.append([row,col])
 
-pos = get_guard_pos()
-
-
-total = 1
-for line in lines:
-    total += line.count('X')
-
-print(total)
+print(len(l_pos) + 1)
